@@ -7,6 +7,14 @@ import (
 	"time"
 )
 
+type Tasks struct {
+	Tasks []Task `json:"tasks"`
+}
+
+type Err struct {
+	Error string `json:"error,omitempty"`
+}
+
 func searchHandler(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("sqlite", "scheduler.db")
 

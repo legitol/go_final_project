@@ -105,7 +105,6 @@ func EditTask(w http.ResponseWriter, r *http.Request) {
 	if task.Title == "" || task.Title == " " {
 		w.WriteHeader(http.StatusBadRequest)
 		wOut(w, Err{Error: "Не указан заголовок задачи"})
-		// http.Error(w, "Не указан заголовок задачи", http.StatusBadRequest)
 		return
 	}
 
@@ -128,7 +127,7 @@ func EditTask(w http.ResponseWriter, r *http.Request) {
 		if task.Repeat == "" || task.Repeat == " " || task.Date == time.Now().Format("20060102") {
 			task.Date = time.Now().Format("20060102")
 		} else {
-			task.Date, err = NextDate(time.Now(), time.Now().Format("20060102"), task.Repeat)
+			task.Date, err = NextDateWM(time.Now(), task.Date, task.Repeat)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				wOut(w, Err{Error: "Oшибка функции вычисления даты выполнения задачи"})

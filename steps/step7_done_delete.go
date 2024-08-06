@@ -48,7 +48,7 @@ func done(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nextDate, err := NextDate(time.Now(), task.Date, task.Repeat)
+	nextDate, err := NextDateWM(time.Now(), task.Date, task.Repeat)
 	_, err = db.Exec("UPDATE scheduler SET date = :date WHERE id = :id",
 		sql.Named("id", task.ID),
 		sql.Named("date", nextDate))

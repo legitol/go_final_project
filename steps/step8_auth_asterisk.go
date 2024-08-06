@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
 	// "strconv"
 	"time"
 
@@ -21,15 +22,6 @@ type Token struct {
 type P struct {
 	Password string `json:"password,omitempty"`
 }
-
-// func authS(w http.ResponseWriter, r *http.Request) {
-// 	r.Method = http.MethodPost
-// 	// switch r.Method {
-// 	// case http.MethodPost:
-// 	auth(w, r)
-// 	return
-// 	//}
-// }
 
 func auth(w http.ResponseWriter, r *http.Request) {
 	envPassword, exists := os.LookupEnv("TODO_PASSWORD")
@@ -127,7 +119,7 @@ func authTask(next http.HandlerFunc) http.HandlerFunc {
 			}
 
 			hashRaw := payload["hash"]
-			
+
 			hashOK, ok := hashRaw.([]interface{})
 			if !ok {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -135,19 +127,19 @@ func authTask(next http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 
-			hashPassFromToken:=[]byte(fmt.Sprint(hashOK))
+			hashPassFromToken := []byte(fmt.Sprint(hashOK))
 
 			hashIn := sha256.Sum256([]byte(password))
-			slice:=hashIn[:]
-			hashPass:=[]byte(fmt.Sprint(slice[:]))
-			
-			if ! bytes.Equal(hashPassFromToken,hashPass){
+			slice := hashIn[:]
+			hashPass := []byte(fmt.Sprint(slice[:]))
+
+			if !bytes.Equal(hashPassFromToken, hashPass) {
 				w.WriteHeader(http.StatusUnauthorized)
 				wOut(w, Token{Error: "Ошибка аутентификации"})
 				return
 			}
 		}
-		
+
 		next(w, r)
 	})
 }

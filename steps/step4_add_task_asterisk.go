@@ -8,6 +8,15 @@ import (
 	"time"
 )
 
+type Task struct {
+	ID      int64  `json:"id,string,omitempty"`
+	Date    string `json:"date,omitempty"`
+	Title   string `json:"title,omitempty" binding:"required"`
+	Comment string `json:"comment,omitempty"`
+	Repeat  string `json:"repeat,omitempty"`
+	Error   string `json:"error,omitempty"`
+}
+
 func AddTaskWM(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("sqlite", "scheduler.db")
 
@@ -80,4 +89,27 @@ func AddTaskWM(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	wOut(w, Task{ID: insertId})
 
+}
+
+func wOut(w http.ResponseWriter, out any) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	json.NewEncoder(w).Encode(out)
+}
+
+func Insert(db *sql.DB, task Task) (int64, error) {
+	row, err := db.Exec("INSERT INTO scheduler (date, title, comment, repeat) VALUES (:date, :title, :comment, :repeat)",
+		sql.Named("date", task.Date),
+		sql.Named("title", task.Title),
+		sql.Named("comment", task.Comment),
+		sql.Named("repeat", task.Repeat))
+
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := row.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return id, err
 }
